@@ -1,6 +1,6 @@
 # todolist
 
-A new Flutter project.
+todo list é uma lista de tarefas.
 
 ## Getting Started
 

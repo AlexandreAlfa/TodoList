@@ -11,10 +11,7 @@ class Todo extends DataClass implements Insertable<Todo> {
   final int id;
   final String description;
   final bool completed;
-  Todo(
-      {@required this.id,
-      @required this.description,
-      @required this.completed});
+  Todo({this.id, @required this.description, @required this.completed});
   factory Todo.fromData(Map<String, dynamic> data, GeneratedDatabase db,
       {String prefix}) {
     final effectivePrefix = prefix ?? '';
@@ -121,7 +118,7 @@ class $TodosTable extends Todos with TableInfo<$TodosTable, Todo> {
   @override
   GeneratedIntColumn get id => _id ??= _constructId();
   GeneratedIntColumn _constructId() {
-    return GeneratedIntColumn('id', $tableName, false,
+    return GeneratedIntColumn('id', $tableName, true,
         hasAutoIncrement: true, declaredAsPrimaryKey: true);
   }
 

@@ -3,7 +3,7 @@ import 'package:moor_flutter/moor_flutter.dart';
 part 'database.g.dart';
 
 class Todos extends Table {
-  IntColumn get id => integer().autoIncrement()();
+  IntColumn get id => integer().autoIncrement().nullable()();
   TextColumn get description => text()();
   BoolColumn get completed => boolean()();
 }
@@ -29,6 +29,11 @@ class DataBase extends _$DataBase {
 
   deleteTodo(int id) {
     return (delete(todos)..where((todo) => todo.id.equals(id))).go();
+  }
+
+  completed(int id, bool completed) {
+    return (update(todos)..where((filter) => filter.id.equals(id)))
+        .write(TodosCompanion(completed: Value(completed)));
   }
 
   @override

@@ -1,6 +1,5 @@
-import 'package:bloc_pattern/bloc_pattern.dart';
 import 'package:flutter/material.dart';
-import 'package:todolist/db/data_bloc.dart';
+import 'package:todolist/components/addTodos.dart';
 import 'package:todolist/db/database.dart';
 
 class Home extends StatefulWidget {
@@ -9,7 +8,7 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  final bloc = BlocProvider.getBloc<DataBloc>();
+  //final bloc = BlocProvider.getBloc<DataBloc>();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -18,24 +17,53 @@ class _HomeState extends State<Home> {
         title: Text('Lista de Tarefas'),
       ),
       body: StreamBuilder<List<Todo>>(
-        stream: bloc.output,
+        stream: DataBase.database.getAll(),
         initialData: [],
         builder: (context, snapshot) {
           List<Todo> todos = snapshot.data;
           return ListView.builder(
             itemCount: todos.length,
             itemBuilder: (BuildContext context, int index) {
-              return ListTile(
-                title: Text(todos[index].description),
-                trailing: todos[index].completed
-                    ? Icon(
-                        Icons.check_circle,
-                        color: Colors.greenAccent,
-                      )
-                    : Icon(Icons.check_circle_outline),
+              return Dismissible(
+                child: ListTile(
+                  title: Text(todos[index].description),
+                  trailing: IconButton(
+                    icon: todos[index].completed
+                        ? Icon(
+                            Icons.check_circle,
+                            color: Colors.greenAccent,
+                          )
+                        : Icon(Icons.check_circle_outline),
+                    onPressed: () {
+                      DataBase.database
+                          .completed(todos[index].id, !todos[index].completed);
+                    },
+                  ),
+                ),
+                onDismissed: (direction) {
+                  DataBase.database.deleteTodo(todos[index].id);
+                  Scaffold.of(context).showSnackBar(SnackBar(
+                      duration: Duration(seconds: 1),
+                      content: Text("${todos[index].description} excluido")));
+                  Scaffold.of(context).showSnackBar(SnackBar(
+                      duration: Duration(seconds: 1),
+                      content:
+                          Text("Não possivel excluir tarefa não concluida.")));
+                },
+                background: Container(
+                  color: Colors.red,
+                  child: Icon(Icons.delete),
+                ),
+                key: Key(todos[index].id.toString()),
               );
             },
           );
+        },
+      ),
+      floatingActionButton: FloatingActionButton(
+        child: Icon(Icons.add),
+        onPressed: () {
+          Navigator.push(context, MaterialPageRoute(builder: (_) => AddTodo()));
         },
       ),
     );
